@@ -1,0 +1,39 @@
+build diviselPor3
+	
+	state q0 initial
+	state q1
+	state q2
+	state qAccept accept
+	
+	task q0, '0'
+		write '0'
+		move   R
+	endtask q0
+	
+	task q0, '1'
+		write '1'
+		move   R
+	endtask q1
+	
+	task q1, '0'
+		write '0'
+		move   R
+	endtask q2
+	
+	task q1, '1'
+		write '1'
+		move   R
+	endtask q0
+	
+	task q2, '0'
+		write '0'
+		move   R
+	endtask q1
+	
+	task q0, blank
+		write blank
+		move   S
+	endtask qAccept
+endbuild
+	
+	tape "110110" into diviselPor3
