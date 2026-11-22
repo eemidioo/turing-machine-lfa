@@ -1,8 +1,13 @@
-target/
-*.class
-*.jar
-!.mvn/wrapper/*.jar
+# Artefatos de build (C)
+build/
+*.o
+*.out
+*.exe
+
+# IDEs e editores
 .idea/
 *.iml
 .vscode/
+
+# Sistema operacional
 .DS_Store
