@@ -37,8 +37,10 @@ make CC=clang CFLAGS="-std=c11 -Wall -Wextra -Wpedantic"
 ├── Makefile
 ├── README.md
 ├── src/
-│   ├── tm_lexer.c   # lexer, parser e ponto de entrada
+│   ├── tm_lexer.c   # lexer e ponto de entrada
 │   └── tm_lexer.h   # tokens, tipos e tabela de palavras reservadas
+│   └── tm_parser.c  # parser e ponto de saída
+│   └── tm_parser.h  # ações, conversão de tokens
 ├── examples/
 │   └── divisivel_por_3.tmt
 └── docs/

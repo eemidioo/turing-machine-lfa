@@ -1,7 +1,7 @@
 // tm_lexer.h
 
-#pragma once
-
+#ifndef TM_LEXER_H
+#define TM_LEXER_H
 // ---------- Bibliotecas usadas ----------
 #include <stdio.h>		
 #include <stdlib.h>		
@@ -177,77 +177,7 @@ static const struct { Command type; Action action; } ReservedAction[] =
 // Quantidade de linhas da tabela ReservedAction.
 static const size_t RESV_ACTIONS_SIZE = sizeof(ReservedAction) / sizeof(ReservedAction[0]);
 
-// Direção do cabeçote da máquina de Turing.
-typedef enum
-{
-	MOVE_NONE,		// sem direção definida
-	MOVE_LEFT,		// andar uma célula para a esquerda
-	MOVE_RIGHT,		// andar uma célula para a direita
-	MOVE_STOP,		// ficar parado na mesma célula
-} MoveDirection;
 
-typedef enum
-{
-    STATE_NORMAL,
-    STATE_INITIAL,
-    STATE_ACCEPT,
-    STATE_REJECT
-} StateType;
-
-typedef struct
-{
-	StateType type;
-	char name[MAX_LEXEMA];
-} StateParam;
-
-typedef struct
-{
-    char state[MAX_LEXEMA];
-    char symbol;
-} TaskParam;
-
-typedef struct
-{
-    char tape[MAX_LEXEMA];
-    char id[MAX_LEXEMA];
-} TapeParam;
-
-static const char* moveNames[] =
-{
-	"NO MOVE", "LEFT", "RIGHT", "STOP",
-};
-
-static const char* stateCondNames[] = 
-{
-	"NORMAL", "INITIAL", "ACCEPT", "REJECT",
-};
-
-typedef struct
-{
-    Action action;
-
-    union
-    {
-        char id[MAX_LEXEMA];
-        char symbol;
-        MoveDirection dir;
-        unsigned long number;
-        StateParam state;
-        TaskParam task;
-        TapeParam tape;
-
-    } param;
-
-} Instruction;
-
-// Lista dinâmica de instruções (o programa já analisado).
-typedef struct
-{
-	Instruction* items;		// as instruções
-	size_t count;			// quantas instruções existem
-	size_t capacity;		// quantas cabem antes de crescer
-	size_t errors;			// quantas linhas com erro foram encontradas
-} InstList;
 
 // ---------- Funções do lexer (texto -> tokens) ----------
 Token			tokenize(Command type, const char* lex, size_t n, const char* base);	// cria token do tipo type com lex de tamanho de 'n' (base é usada para calcular coluna)
@@ -268,15 +198,13 @@ Action			commandToAction(Command command);												// converte o tipo do prim
 
 // ---------- Leitura de arquivo ----------
 void			TMLexer(TokenArray *tokArr, const char* line);									// divide uma linha em tokens e os guarda em tokArr
-int 			TMReadLine(FILE* file, char** line, size_t *cap);								// lê uma linha do arquivo: 1 = leu, 0 = fim do arquivo, -1 = erro
-int				TMReadFile(const char* path);													// lê o arquivo .tm, gera os tokens e os mostra: 1 = ok, 0 = erro
 
 // ---------- Checagem de sintaxe: partes de uma instrução ----------
-static bool		TMCheckLineEnd(TokenIter* iter);											// a linha terminou? (NL ou EOF)
-static bool		TMCheckId(TokenIter* iter);													// espera um identificador (nome)
-static bool		TMCheckNumber(TokenIter* iter);												// espera um número
-static bool		TMCheckChar(TokenIter* iter);												// espera um símbolo entre aspas simples, ex.: '0'
-static bool		TMCheckString(TokenIter* iter);												// espera uma fita entre aspas duplas, ex.: "1011"
+bool			TMCheckLineEnd(TokenIter* iter);											// a linha terminou? (NL ou EOF)
+bool			TMCheckId(TokenIter* iter);													// espera um identificador (nome)
+bool			TMCheckNumber(TokenIter* iter);												// espera um número
+bool			TMCheckChar(TokenIter* iter);												// espera um símbolo entre aspas simples, ex.: '0'
+bool			TMCheckString(TokenIter* iter);												// espera uma fita entre aspas duplas, ex.: "1011"
 
 // ---------- Checagem de sintaxe: uma função por instrução ----------
 // Cada uma devolve true se a linha está correta (e avança), ou false (e volta ao início da linha).
@@ -296,23 +224,8 @@ static inline bool	TMCheckHalt(TokenIter 		*iter);		// halt
 
 // ---------- Parser (tokens -> instruções) ----------
 Action			TMCheckFunction(TokenIter* iter);				// confere uma linha e devolve a ação dela (ACTION_ERROR se estiver errada)
-static size_t	TMLineOf(TokenIter* iter, size_t index);		// número da linha (a partir de 1) do token na posição index
-static void		TMReportError(TokenIter* iter);					// mostra o erro da linha atual (léxico ou de sintaxe)
-static void		TMSkipLine(TokenIter* iter);					// pula o resto da linha com erro para continuar a análise
-static bool 	TMReadParam(TokenIter* iter,   Command expected,  char* dest,  size_t capacity);
 
-static bool		TMParseBuild(TokenIter* iter, Instruction* inst);
-static bool		TMParseState(TokenIter* iter, Instruction* inst);
-static bool		TMParseWrite(TokenIter* iter, Instruction* inst);
-static bool		TMParseMove(TokenIter* iter, Instruction* inst);
-static bool		TMParseTask(TokenIter* iter, Instruction* inst);
-static bool		TMParseTape(TokenIter* iter, Instruction* inst);
-static bool		TMParseBlank(TokenIter* iter, Instruction* inst);
-static bool		TMParseLimit(TokenIter* iter, Instruction* inst);
 
-InstList		TMParseFunction(TokenIter* iter);				// percorre todos os tokens e monta a lista de instruções
-void			TMGetInstructions(InstList list);				// imprime  toda a lista de instruções.
-void			TMExecuteFunction(Instruction inst);			// executa uma instrução na máquina (a implementar)
 
 // ---------- Testes de caractere ----------
 // O (unsigned char) evita erro com acentos. IS_IDCHAR = letra, dígito ou "_" (vale dentro de um nome).
@@ -333,3 +246,5 @@ static inline bool pathIsDir(const char* filePath)
 
   return true;
 }
+
+#endif
